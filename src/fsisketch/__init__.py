@@ -15,7 +15,8 @@
 from fsisketch.bloom_calculations import max_buckets_per_element, compute_bloom_spec
 from fsisketch.hash import buckets
 import mmaparray
-import mmh3
+
+import six
 
 class Sketch(object):
     def __init__(self, filename, typecode, size, fp_prob=0.001, seed=0, read_only=False, want_lock=False):
@@ -101,8 +102,8 @@ class CMSketch(Sketch):
         if delta == 0:
             return
 
-        for i in buckets(key, self._num_rows, self._row_size):
+        for i in buckets(six.b(key), self._num_rows, self._row_size):
             self._backing[i] += delta
 
     def __getitem__(self, key):
-        return min(self._backing[i] for i in buckets(key, self._num_rows, self._row_size))
+        return min(self._backing[i] for i in buckets(six.b(key), self._num_rows, self._row_size))

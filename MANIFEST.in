@@ -3,3 +3,6 @@ include LICENSE
 include COPYRIGHT
 include requirements.txt
 include README.rst
+include src/fsisketch/MurmurHash3.cpp
+include src/fsisketch/MurmurHash3.h
+

@@ -26,12 +26,18 @@ setup(
   package_dir = { '' : 'src' },
   cmdclass = { 'build_ext' : build_ext },
   ext_modules=[
-      Extension('fsisketch.hash', sources=['src/fsisketch/hash.pyx'])],
+      Extension('fsisketch.hash',
+          sources=[
+              'src/fsisketch/hash.pyx',
+              'src/fsisketch/MurmurHash3.cpp',
+              ],
+          language='c++',
+          )],
   version='0.1',
   url='https://github.com/farsightsec/fsisketch',
   license = 'MIT License',
   test_suite = 'tests',
-  requires = [ 'mmaparray', 'mmh3', 'six', 'Cython' ],
+  requires = [ 'mmaparray', 'six', 'Cython' ],
   classifiers = [
     'License :: OSI Approved :: Apache Software License',
     'Programming Language :: Cython',
