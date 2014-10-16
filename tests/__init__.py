@@ -26,10 +26,6 @@ class TestCMSketch(unittest.TestCase):
 
         self.sketch = CMSketch(self.backing.name, 'h', 500, fp_prob=1e-4)
 
-    def test_buckets(self):
-        self.assertEqual(list(self.sketch._buckets('abcdef')), 
-                [621, 1537, 2285, 3865, 4277, 5521, 6597, 7505, 8245, 9817])
-
     def test_add(self):
         for w in words[:500]:
             self.assertNotIn(w, self.sketch)

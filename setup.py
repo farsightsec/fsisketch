@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
+from setuptools.extension import Extension
+from Cython.Distutils import build_ext
 
 setup(
   name = 'fsisketch',
@@ -22,11 +24,14 @@ setup(
   long_description = open('README.rst').read(),
   packages = find_packages('src'),
   package_dir = { '' : 'src' },
+  cmdclass = { 'build_ext' : build_ext },
+  ext_modules=[
+      Extension('fsisketch.hash', sources=['src/fsisketch/hash.pyx'])],
   version='0.1',
   url='https://github.com/farsightsec/fsisketch',
   license = 'MIT License',
   test_suite = 'tests',
-  requires = [ 'mmaparray', 'mmh3', 'six' ],
+  requires = [ 'mmaparray', 'mmh3', 'six', 'Cython' ],
   classifiers = [
     'License :: OSI Approved :: Apache Software License',
     'Programming Language :: Cython',

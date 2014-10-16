@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from fsisketch.bloom_calculations import max_buckets_per_element, compute_bloom_spec
+from fsisketch.hash import buckets
 import mmaparray
 import mmh3
 
@@ -31,14 +32,6 @@ class Sketch(object):
     def clear(self):
         for i in range(0, len(self._backing)):
             self._backing[i] = 0
-
-    def _buckets(self, key):
-        (h1, h2) = mmh3.hash64(key, seed=self._seed)
-        h1 += 2**63
-        h2 += 2**63
-
-        for i in range(0, self._num_rows):
-            yield (h1 + i**2 * h2) % self._row_size + i * self._row_size
 
     def __setitem__(self, key, value):
         raise NotImplementedError()
@@ -108,8 +101,8 @@ class CMSketch(Sketch):
         if delta == 0:
             return
 
-        for i in self._buckets(key):
+        for i in buckets(key, self._num_rows, self._row_size):
             self._backing[i] += delta
 
     def __getitem__(self, key):
-        return min(self._backing[i] for i in self._buckets(key))
+        return min(self._backing[i] for i in buckets(key, self._num_rows, self._row_size))

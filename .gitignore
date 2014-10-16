@@ -1,5 +1,7 @@
 .*.swp
 *.pyc
+*.so
 /build
 /dist
 fsisketch.egg-info
+/src/fsisketch/hash.c
