@@ -46,7 +46,7 @@ class Sketch(object):
         raise NotImplementedError()
 
     def __contains__(self, key):
-        return bool(self[key])
+        return self[key] > 0
 
     def add(self, key, count=1):
         raise NotImplementedError()
