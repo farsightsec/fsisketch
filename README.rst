@@ -19,7 +19,9 @@ there is a chance of error when you say that something is in the set.  This
 algorithm is different from a Bloom filter in that it is a multiset instead
 of a set and you can use it to count instances.  It works much like a python 
 set except that you can never retrieve keys, only values.  All typical set
-operations, except union, are supported.
+operations, except union, are supported.  You will have better results if
+you use the add/remove/discard functions instead of the assignment operators
+as the former are less disruptive to the internal data structure.
 
 Usage
 -----

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from fsisketch.bloom_calculations import max_buckets_per_element, compute_bloom_spec
-from fsisketch.hash import buckets
+import fsisketch.hash
 import mmaparray
 
 import six
@@ -34,6 +34,11 @@ class Sketch(object):
         for i in range(0, len(self._backing)):
             self._backing[i] = 0
 
+    def _buckets(self, key):
+        if not isinstance(key, six.binary_type):
+            key = six.b(key)
+        return fsisketch.hash.buckets(key, self._num_rows, self._row_size)
+
     def __setitem__(self, key, value):
         raise NotImplementedError()
 
@@ -44,14 +49,14 @@ class Sketch(object):
         return bool(self[key])
 
     def add(self, key, count=1):
-        self[key] += count
+        raise NotImplementedError()
 
     def remove(self, key, count=1):
-        self[key] -= count
+        raise NotImplementedError()
 
     def discard(self, key, count=1):
-        if key in self:
-            self[key] -= count
+        if self[key] >= count:
+            self.remove(key, count)
 
     def intersection(self, s):
         return [v for v in s if v in self]
@@ -86,7 +91,7 @@ class Sketch(object):
                     self._backing[i] += s._backing[i]
             else:
                 for v in s:
-                    self[v] += 1
+                    self.add(v)
 
 class CMSketch(Sketch):
     def __init__(self, filename, typecode, size, fp_prob=0.001, seed=0, read_only=False, want_lock=False):
@@ -97,13 +102,15 @@ class CMSketch(Sketch):
 
 
     def __setitem__(self, key, value):
-        delta = value - self[key]
-
-        if delta == 0:
-            return
-
-        for i in buckets(six.b(key), self._num_rows, self._row_size):
-            self._backing[i] += delta
+        for i in self._buckets(key):
+            self._backing[i] = value
 
     def __getitem__(self, key):
-        return min(self._backing[i] for i in buckets(six.b(key), self._num_rows, self._row_size))
+        return min(self._backing[i] for i in self._buckets(key))
+
+    def add(self, key, count=1):
+        for i in self._buckets(key):
+            self._backing[i] += count
+
+    def remove(self, key, count=1):
+        self.add(key, -count)
